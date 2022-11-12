@@ -11,23 +11,26 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 
-import de.pkaiser.imageorganizer.Image;
+import de.pkaiser.imageorganizer.DatedMediaFile;
 
-public class MetadataImageReader implements ImageReader {
+public class MetadataReader implements DatedMediaFileReader {
 
 	@Override
-	public Image read(final File file) throws FileNotFoundException, IOException, ImageProcessingException  {
+	public DatedMediaFile read(final File file) throws FileNotFoundException, IOException, ImageProcessingException  {
 		try (FileInputStream stream = new FileInputStream(file)) {
 			final Metadata metadata = ImageMetadataReader.readMetadata(stream);
 			ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 			if (directory != null) {
 				final Date date = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
 				if (date != null) {
-					return new Image(file, date.toInstant());
+					return new DatedMediaFile(file, date.toInstant());
 				}
 			}
-			return null;
-		}
+		} catch (ImageProcessingException e) {}
+		
+		// log.warn("Missing metadata: {}", file.toPath());
+		
+		return null;
 	}
 
 }

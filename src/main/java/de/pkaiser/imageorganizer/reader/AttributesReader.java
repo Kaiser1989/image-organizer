@@ -5,17 +5,17 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 
-import de.pkaiser.imageorganizer.Image;
+import de.pkaiser.imageorganizer.DatedMediaFile;
 
-public class AttributesImageReader implements ImageReader {
+public class AttributesReader implements DatedMediaFileReader {
 
 	@Override
-	public Image read(File file) throws Exception {
+	public DatedMediaFile read(File file) throws Exception {
 		final BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
 		final Instant timeCreated = attr.creationTime().toInstant();
 		final Instant timeModified = attr.lastModifiedTime().toInstant();
 		final Instant time = timeCreated.isBefore(timeModified) ? timeCreated : timeModified;
-		return new Image(file, time);
+		return new DatedMediaFile(file, time);
 	}
 
 }

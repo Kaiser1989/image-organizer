@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FilenameImagePattern {
+public class FilenamePattern {
 
 	private final Pattern pattern;
 	
@@ -21,7 +21,7 @@ public class FilenameImagePattern {
 		
 	private final DateTimeFormatter dateFormatter;
 	
-	public FilenameImagePattern(final String pattern, final int dateGroup, final String dateFormat) {
+	public FilenamePattern(final String pattern, final int dateGroup, final String dateFormat) {
 		this.pattern = Pattern.compile(pattern);
 		this.dateGroup = dateGroup;
 		this.dateFormatter = new DateTimeFormatterBuilder().appendPattern(dateFormat)

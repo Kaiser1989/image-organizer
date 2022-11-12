@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "paths")
-public class ImageSettings {
+public class OrganizerSettings {
 	
 	private String origin;
 	
