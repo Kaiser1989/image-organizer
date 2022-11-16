@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.TimeZone;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
@@ -21,7 +22,7 @@ public class MetadataReader implements DatedMediaFileReader {
 			final Metadata metadata = ImageMetadataReader.readMetadata(stream);
 			ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 			if (directory != null) {
-				final Date date = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+				final Date date = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL, TimeZone.getDefault());
 				if (date != null) {
 					return new DatedMediaFile(file, date.toInstant());
 				}

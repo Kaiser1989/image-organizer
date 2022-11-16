@@ -31,14 +31,15 @@ public class OrganizerService {
 		final DatedMediaFileReader reader = new ChainedReader(
 			new MetadataReader(),
 			new FilenameReader(
+				// this
+				new FilenamePattern("([0-9]{8}_[0-9]{6})(.*)\\.(jpg|mov|mp4)", 1, "yyyyMMdd_HHmmss"),
 				// default
 				new FilenamePattern("IMG_([0-9]{8}_[0-9]{6})(.*)\\.jpg", 1, "yyyyMMdd_HHmmss"),
 				new FilenamePattern("VID_([0-9]{8}_[0-9]{6})(.*)\\.mp4", 1, "yyyyMMdd_HHmmss"),
 				// pixel
 				new FilenamePattern("PXL_([0-9]{8}_[0-9]{6})(.*)\\.jpg", 1, "yyyyMMdd_HHmmss"),
 				// windows phone
-				new FilenamePattern("WP_([0-9]{8}_[0-9]{2}_[0-9]{2}_[0-9]{2})(.*)\\.jpg", 1, "yyyyMMdd_HH_mm_ss"),
-				new FilenamePattern("WP_([0-9]{8}_[0-9]{2}_[0-9]{2}_[0-9]{2})(.*)\\.mp4", 1, "yyyyMMdd_HH_mm_ss"),
+				new FilenamePattern("WP_([0-9]{8}_[0-9]{2}_[0-9]{2}_[0-9]{2})(.*)\\.(jpg|mp4)", 1, "yyyyMMdd_HH_mm_ss"),
 				// signal
 				new FilenamePattern("signal-([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})(.*)\\.jpg", 1, "yyyy-MM-dd-HH-mm-ss"),
 				// whatsapp
@@ -49,12 +50,12 @@ public class OrganizerService {
 			new AttributesReader()
 		);
 		
-		final DatedMediaFileWriter writer = new DatedMediaFileWriter(settings.getTarget());
+		final DatedMediaFileWriter writer = new DatedMediaFileWriter(settings.getArchive());
 		
-		log.info("Searching for media files in {}", settings.getOrigin());
+		log.info("Searching for media files in {}", settings.getArchive());
 		
 		for (File file : FileUtils.listFiles(
-				new File(settings.getOrigin()), 
+				new File(settings.getArchive()), 
 				new RegexFileFilter(mediaTypeRegex()), 
 				DirectoryFileFilter.DIRECTORY)) {
 			
@@ -64,6 +65,9 @@ public class OrganizerService {
 			// write image
 			writer.write(datedFile);
 		}
+		
+		// clear empty folders
+		this.deleteEmptyDirectories(new File(settings.getArchive()));			
 	}
 	
 	private String mediaTypeRegex() {
@@ -73,4 +77,16 @@ public class OrganizerService {
 		).collect(Collectors.joining("|"));
 		return String.format("^.*?\\.(%s|%s)$", endings.toLowerCase(), endings.toUpperCase());
 	}
+	
+	private void deleteEmptyDirectories(final File parent) {
+		for (final File child : parent.listFiles()) {
+			if (child.isDirectory()) {			
+				deleteEmptyDirectories(child);
+				if (child.listFiles().length == 0) {
+					child.delete();
+				}
+			}			
+		}
+	}
+	
 }

@@ -10,7 +10,5 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "paths")
 public class OrganizerSettings {
 	
-	private String origin;
-	
-	private String target;
+	private String archive;
 }
