@@ -50,14 +50,16 @@ public class OrganizerService {
 			new AttributesReader()
 		);
 		
-		final DatedMediaFileWriter writer = new DatedMediaFileWriter(settings.getArchive());
+		final DatedMediaFileWriter writer = new DatedMediaFileWriter(settings.getPath());
 		
-		log.info("Searching for media files in {}", settings.getArchive());
+		log.info("Searching for media files in {}", settings.getPath());
 		
 		for (File file : FileUtils.listFiles(
-				new File(settings.getArchive()), 
+				new File(settings.getPath()), 
 				new RegexFileFilter(mediaTypeRegex()), 
 				DirectoryFileFilter.DIRECTORY)) {
+			
+			log.info("Processing file: {}", file.getPath());
 			
 			// read image
 			final DatedMediaFile datedFile = reader.read(file);
@@ -66,8 +68,10 @@ public class OrganizerService {
 			writer.write(datedFile);
 		}
 		
+		log.info("Cleanup empty directories");
+		
 		// clear empty folders
-		this.deleteEmptyDirectories(new File(settings.getArchive()));			
+		this.deleteEmptyDirectories(new File(settings.getPath()));			
 	}
 	
 	private String mediaTypeRegex() {

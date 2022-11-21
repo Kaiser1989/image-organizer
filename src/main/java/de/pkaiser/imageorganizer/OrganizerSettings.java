@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "paths")
+@ConfigurationProperties(prefix = "config")
 public class OrganizerSettings {
 	
-	private String archive;
+	private String path;
 }

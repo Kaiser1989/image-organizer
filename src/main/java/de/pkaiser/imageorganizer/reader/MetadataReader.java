@@ -28,9 +28,7 @@ public class MetadataReader implements DatedMediaFileReader {
 				}
 			}
 		} catch (ImageProcessingException e) {}
-		
-		// log.warn("Missing metadata: {}", file.toPath());
-		
+				
 		return null;
 	}
 
