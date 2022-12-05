@@ -14,7 +14,7 @@ public class Application {
 	public static void main(String[] args) throws BeansException, Exception {
 		ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
 		ctx.getBean(OrganizerService.class).organize();
-		
+
 		// close again
 		log.info("Closing Application");
 		ctx.close();

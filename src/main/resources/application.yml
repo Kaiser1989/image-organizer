@@ -1,2 +1,1 @@
-paths:
-  archive: "D:\\TestArchive"
+archivePath: "D:\\TestArchive"

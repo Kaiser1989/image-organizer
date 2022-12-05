@@ -19,25 +19,24 @@ public class DatedMediaFile {
 	public static Set<String> VIDEO_TYPES = new HashSet<>(Arrays.asList("avi", "mp4", "mov"));
 
 	private File file;
-	
+
 	private Instant date;
 
 	private MediaFileType mediaType;
-	
+
 	public DatedMediaFile(final File file, final Instant date) {
 		this.file = file;
 		this.date = date;
-		
-		final String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();	
+
+		final String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
 		if (IMAGE_TYPES.contains(extension)) {
 			this.mediaType = MediaFileType.IMAGE;
 		} else {
 			this.mediaType = MediaFileType.VIDEO;
 		}
 	}
-	
+
 	public static enum MediaFileType {
-		IMAGE,
-		VIDEO;
+		IMAGE, VIDEO;
 	}
 }
