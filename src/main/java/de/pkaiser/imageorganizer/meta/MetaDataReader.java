@@ -14,7 +14,6 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.Optional;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,16 +29,14 @@ public class MetaDataReader {
 
 	private static FilenamePattern[] IMAGE_PATTERNS = {
 			// default
-			new FilenamePattern("IMG_([0-9]{8}_[0-9]{6})(.*)\\.jpg", 1, "yyyyMMdd_HHmmss"),
-			// pixel
-			new FilenamePattern("PXL_([0-9]{8}_[0-9]{6})(.*)\\.jpg", 1, "yyyyMMdd_HHmmss"),
-			// whatsapp
-			new FilenamePattern("IMG-([0-9]{8})-WA(.*)\\.jpg", 1, "yyyyMMdd"),
+			new FilenamePattern("[a-zA-Z]+[-_]([0-9]{8}_[0-9]{6})(.*)\\.*", 1, "yyyyMMdd_HHmmss"),
 			// windows phone
-			new FilenamePattern("WP_([0-9]{8}_[0-9]{2}_[0-9]{2}_[0-9]{2})(.*)\\.(jpg)", 1, "yyyyMMdd_HH_mm_ss"),
+			new FilenamePattern("[a-zA-Z]+[-_]([0-9]{8}_[0-9]{2}_[0-9]{2}_[0-9]{2})(.*)\\.*", 1, "yyyyMMdd_HH_mm_ss"),
 			// signal
-			new FilenamePattern("signal-([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})(.*)\\.jpg", 1,
-					"yyyy-MM-dd-HH-mm-ss") };
+			new FilenamePattern("[a-zA-Z]+[-_]([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})(.*)\\.*", 1,
+					"yyyy-MM-dd-HH-mm-ss"),
+			// whatsapp
+			new FilenamePattern("[a-zA-Z]+[-_]([0-9]{8})(.*)\\.*", 1, "yyyyMMdd") };
 
 	public boolean hasCreationDate(final Path path) {
 		return this.read(path).isPresent();
@@ -50,7 +47,7 @@ public class MetaDataReader {
 			final Metadata metadata = ImageMetadataReader.readMetadata(stream);
 			final ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 			if (directory != null) {
-				final Date date = directory.getDateOriginal(TimeZone.getDefault());
+				final Date date = directory.getDateOriginal();
 				if (date != null) {
 					return Optional.of(date.toInstant());
 				}

@@ -33,6 +33,11 @@ public class MetaDataWriter {
 			.withZone(ZoneId.systemDefault());
 
 	public void update(final Path path, final Instant time) {
+		// check if this is an image
+		if (!this.isImage(path)) {
+			return;
+		}
+
 		Path temp = null;
 		try {
 			// update metadata (delete old entry before adding new one
@@ -62,6 +67,10 @@ public class MetaDataWriter {
 				}
 			}
 		}
+	}
+
+	private boolean isImage(final Path path) {
+		return Imaging.hasImageFileExtension(path.toFile());
 	}
 
 	private TiffOutputSet extractMetaData(final Path path) throws ImageReadException, IOException, ImageWriteException {

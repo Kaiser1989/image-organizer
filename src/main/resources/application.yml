@@ -1,1 +1,5 @@
-archivePath: "D:\\TestArchive"
+app:
+   folder: "D:\\TestArchive"
+   archive: true
+   images: [jpg, jpeg, png, gif]
+   videos: [avi, mp4, mov]

@@ -2,9 +2,7 @@ package de.pkaiser.imageorganizer;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,26 +25,24 @@ public class OrganizerService {
 
 		// save files to save file tree iterations
 		Map<Path, Optional<Instant>> files = new LinkedHashMap<>();
-		List<Path> failedFiles = new ArrayList<>();
 
 		// first of all, restore all meta data
 		log.info("Start restoring metadata ...");
 		final MetaDataRestorer restorer = new MetaDataRestorer();
-		new MediaFileVisitor(settings.getPath()).run(path -> {
-			try {
-				files.put(path, restorer.restore(path));
-			} catch (IllegalArgumentException e) {
-				failedFiles.add(path);
-			}
+		new MediaFileVisitor(settings.getFolder()).run(path -> {
+			files.put(path, restorer.restore(path));
 		});
 
+		// check if we should stop after restoring
+		if (!settings.isArchive()) {
+			return;
+		}
+
 		log.info("Start moving files ...");
-		final Archiver archiver = new Archiver(settings.getPath());
+		final Archiver archiver = new Archiver(settings.getFolder());
 		files.forEach((path, optTime) -> {
 			optTime.ifPresent(time -> archiver.archive(path, time));
 		});
-
-		failedFiles.forEach(path -> log.info("File cannot be processed {}", path));
 
 		log.info("delete empty folders ...");
 		archiver.cleanEmptyFolders();
