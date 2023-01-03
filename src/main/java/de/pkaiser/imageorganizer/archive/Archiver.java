@@ -40,10 +40,15 @@ public class Archiver {
 		// update until we find unique id
 		Path newPath;
 		while ((newPath = builder.build()).toFile().exists()) {
-			// if (ImageComparator.equals(path, newPath)) {
-			// // just skip duplicated images
-			// return;
-			// }
+			if (ImageComparator.equals(path, newPath)) {
+				log.info("Deleting duplicated file: {}", path);
+				try {
+					Files.delete(path);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+				return;
+			}
 			log.info("File with name {} already exists", newPath);
 			builder.updateId();
 		}

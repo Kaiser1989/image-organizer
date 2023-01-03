@@ -56,7 +56,7 @@ public class DatedMediaFileWriter {
 				date.getDayOfMonth());
 		final String idPart = String.format("%02d%02d%02d00", date.getHour(), date.getMinute(), date.getSecond());
 		final Path directory = new File(this.targetDirectory).toPath()
-				.resolve(String.format("%d/%d", date.getYear(), date.getMonthValue()));
+				.resolve(String.format("%d/%02d", date.getYear(), date.getMonthValue()));
 		final String extension = FilenameUtils.getExtension(image.getFile().getName());
 		return new PathBuilder(directory, datePart, idPart, extension);
 	}

@@ -19,7 +19,7 @@ public class ImageComparator {
 				// check if both paths are images
 				final String extension = FilenameUtils.getExtension(path1.getFileName().toString()).toLowerCase();
 				if (!MediaFileVisitor.IMAGE_TYPES.contains(extension)) {
-					return false;
+					return true;
 				}
 
 				// process images
@@ -28,8 +28,8 @@ public class ImageComparator {
 				if (img1.getWidth() == img2.getWidth() && img1.getHeight() == img2.getHeight()) {
 
 					// check random values
-					final int[] xs = new Random().ints(5, 0, img1.getWidth()).toArray();
-					final int[] ys = new Random().ints(5, 0, img1.getHeight()).toArray();
+					final int[] xs = new Random().ints(3, 0, img1.getWidth()).sorted().toArray();
+					final int[] ys = new Random().ints(3, 0, img1.getHeight()).sorted().toArray();
 					for (int x = 0; x < xs.length; x++) {
 						for (int y = 0; y < ys.length; y++) {
 							if (img1.getRGB(x, y) != img2.getRGB(x, y))
@@ -43,9 +43,7 @@ public class ImageComparator {
 			} else {
 				return false;
 			}
-		} catch (
-
-		IOException e) {
+		} catch (IOException e) {
 			return false;
 		}
 	}
