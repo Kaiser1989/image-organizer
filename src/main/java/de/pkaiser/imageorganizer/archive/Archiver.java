@@ -73,7 +73,7 @@ public class Archiver {
 				date.getDayOfMonth());
 		final String timePart = String.format("%02d%02d%02d", date.getHour(), date.getMinute(), date.getSecond());
 		final Path directory = new File(this.path).toPath()
-				.resolve(String.format("%d/%d", date.getYear(), date.getMonthValue()));
+				.resolve(String.format("%d/%02d", date.getYear(), date.getMonthValue()));
 		final String extension = FilenameUtils.getExtension(path.getFileName().toString()).toLowerCase();
 		return new PathBuilder(directory, datePart, timePart, extension);
 	}
