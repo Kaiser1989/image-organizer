@@ -11,6 +11,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
@@ -79,10 +80,10 @@ public class Archiver {
 	}
 
 	private void cleanEmptyFolders(final File parent) {
-		for (final File child : parent.listFiles()) {
+		for (final File child : Objects.requireNonNull(parent.listFiles())) {
 			if (child.isDirectory()) {
 				this.cleanEmptyFolders(child);
-				if (child.listFiles().length == 0) {
+				if (Objects.requireNonNull(child.listFiles()).length == 0) {
 					child.delete();
 				}
 			}
@@ -91,13 +92,13 @@ public class Archiver {
 
 	protected static class PathBuilder {
 
-		private Path directory;
+		private final Path directory;
 
-		private String datePart;
+		private final String datePart;
 
-		private String timePart;
+		private final String timePart;
 
-		private String extension;
+		private final String extension;
 
 		private int idPart;
 

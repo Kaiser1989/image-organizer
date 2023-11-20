@@ -1,12 +1,12 @@
 package de.pkaiser.imageorganizer;
 
+import de.pkaiser.imageorganizer.duplicates.DuplicateFinder;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.pkaiser.imageorganizer.archive.Archiver;
@@ -18,8 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class OrganizerService {
 
-	@Autowired
-	private Settings settings;
+	private final Settings settings;
+
+	public OrganizerService(final Settings settings) {
+		this.settings = settings;
+	}
 
 	public void organize() throws Exception {
 
@@ -46,5 +49,13 @@ public class OrganizerService {
 
 		log.info("delete empty folders ...");
 		archiver.cleanEmptyFolders();
+
+		// check if we should stop after archiving
+		if (!settings.isCleanDuplicates()) {
+			return;
+		}
+
+		log.info("Clean duplicates ...");
+		new DuplicateFinder(settings.getFolder()).clean();
 	}
 }

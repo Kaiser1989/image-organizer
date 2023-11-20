@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MetaDataReader {
 
-	private static FilenamePattern[] IMAGE_PATTERNS = {
+	private static final FilenamePattern[] IMAGE_PATTERNS = {
 			// default
 			new FilenamePattern("[a-zA-Z]+[-_]([0-9]{8}_[0-9]{6})(.*)\\.*", 1, "yyyyMMdd_HHmmss"),
 			// windows phone
@@ -37,10 +37,6 @@ public class MetaDataReader {
 					"yyyy-MM-dd-HH-mm-ss"),
 			// whatsapp
 			new FilenamePattern("[a-zA-Z]+[-_]([0-9]{8})(.*)\\.*", 1, "yyyyMMdd") };
-
-	public boolean hasCreationDate(final Path path) {
-		return this.read(path).isPresent();
-	}
 
 	public Optional<Instant> read(final Path path) {
 		try (FileInputStream stream = new FileInputStream(path.toFile())) {
