@@ -1,6 +1,9 @@
 package de.pkaiser.imageorganizer.duplicates;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -16,19 +19,24 @@ public class Histogram {
 
   public Histogram(final File file) throws IOException {
     this.file = file;
-    this.channels = new float[2][2][2];
-    BufferedImage image = ImageIO.read(file);
+    this.channels = new float[4][4][4];
 
-    for (int x = 0; x < image.getWidth(); x++) {
-      for (int y = 0; y < image.getHeight(); y++) {
-        int color = image.getRGB(x, y);
-        int red = (color & 0x00ff0000) >> 16;
-        int green = (color & 0x0000ff00) >> 8;
-        int blue = color & 0x000000ff;
-        channels[red / 128][green / 128][blue / 128]++;
-      }
+    final BufferedImage image = ImageIO.read(file);
+    final int res = image.getWidth() * image.getHeight();
+    final Raster raster = image.getData();
+    final int bands = raster.getNumBands();
+    if (bands > 4) {
+      throw new IllegalArgumentException("Does not support images with higher bands");
     }
-    int res = image.getWidth() * image.getHeight();
+    final byte[] data = ((DataBufferByte) raster.getDataBuffer()).getData();
+
+    for (int x = 0; x < res * bands; x += bands) {
+      int[] ch = new int[4];
+      for (int i = 0; i < bands; i++) {
+        ch[i] = data[x + i] & 0xff;
+      }
+      channels[ch[0] / 64][ch[1] / 64][ch[2] / 64]++;
+    }
     for (int i = 0; i < channels.length; i++) {
       for (int j = 0; j < channels[i].length; j++) {
         for (int p = 0; p < channels[i][j].length; p++) {
@@ -45,19 +53,15 @@ public class Histogram {
     }
 
     // compare histograms
-    float[][][] ch = new float[2][2][2];
-    for (int i = 0; i < ch.length; i++) {
-      for (int j = 0; j < ch[i].length; j++) {
-        for (int p = 0; p < ch[i][j].length; p++) {
-          ch[i][j][p] = Math.abs(h1.channels[i][j][p] - h2.channels[i][j][p]);
-          //System.out.println("t[" + i + "][" + j + "][" + p + "] = " + ch[i][j][p]);
-          if (ch[i][j][p] > 1) {
-            return false;
-          }
+    float sum = 0;
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        for (int p = 0; p < 4; p++) {
+          sum += Math.abs(h1.channels[i][j][p] - h2.channels[i][j][p]);
         }
       }
     }
-    return true;
+    return sum <= 1;
   }
 
   @Override

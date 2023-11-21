@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -30,14 +31,17 @@ public class DuplicateFinder {
         final Set<File> duplicates = new HashSet<>();
 
         // calculate histograms for all files of a folder
-        final List<Histogram> histograms = new ArrayList<>();
-        for (final File file : Objects.requireNonNull(month.listFiles(File::isFile))) {
-          final String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
-          if (MediaFileVisitor.IMAGE_TYPES.contains(extension)) {
-            log.info("Calculating histogram for file: {}", file.toPath());
-            histograms.add(new Histogram(file));
+        final List<Histogram> histograms = Arrays.stream(Objects.requireNonNull(month.listFiles(File::isFile))).parallel().filter(x -> {
+          final String extension = FilenameUtils.getExtension(x.getName()).toLowerCase();
+          return MediaFileVisitor.IMAGE_TYPES.contains(extension);
+        }).map(x -> {
+          try {
+            log.info("Calculating histogram for file: {}", x.toPath());
+            return new Histogram(x);
+          } catch (IOException e) {
+            return null;
           }
-        }
+        }).filter(Objects::nonNull).toList();
 
         // find duplicates and move to subfolder duplicates
         for (int i = 0; i < histograms.size(); i++) {
