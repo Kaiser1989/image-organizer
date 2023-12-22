@@ -17,12 +17,15 @@ public class DuplicatedImageFinderTest {
       "test_same3.jpg").toPath();
 
   private static final Path TEST_IMAGE_4 = FileUtils.getFile("src", "test", "resources",
-      "test_not_same1.jpg").toPath();
+      "test_same4.jpg").toPath();
 
   private static final Path TEST_IMAGE_5 = FileUtils.getFile("src", "test", "resources",
-      "test_not_same2.jpg").toPath();
+      "test_not_same1.jpg").toPath();
 
   private static final Path TEST_IMAGE_6 = FileUtils.getFile("src", "test", "resources",
+      "test_not_same2.jpg").toPath();
+
+  private static final Path TEST_IMAGE_7 = FileUtils.getFile("src", "test", "resources",
       "black.jpg").toPath();
 
   @Test
@@ -31,14 +34,16 @@ public class DuplicatedImageFinderTest {
     final Histogram h1 = new Histogram(TEST_IMAGE_1.toFile());
     final Histogram h2 = new Histogram(TEST_IMAGE_2.toFile());
     final Histogram h3 = new Histogram(TEST_IMAGE_3.toFile());
-
     final Histogram h4 = new Histogram(TEST_IMAGE_4.toFile());
+
     final Histogram h5 = new Histogram(TEST_IMAGE_5.toFile());
+    final Histogram h6 = new Histogram(TEST_IMAGE_6.toFile());
     System.out.println("Tack: " + (System.currentTimeMillis() - tick));
 
-    System.out.println("Same image: " + Histogram.isSimilar(h1, h2));
-    System.out.println("Same image: " + Histogram.isSimilar(h1, h3));
-    System.out.println("Same image: " + Histogram.isSimilar(h4, h5));
+    System.out.println("Same image: " + Histogram.checkSimilarity(h1, h2));
+    System.out.println("Same image: " + Histogram.checkSimilarity(h1, h3));
+    System.out.println("Same image: " + Histogram.checkSimilarity(h2, h4));
+    System.out.println("Same image: " + Histogram.checkSimilarity(h5, h6));
   }
 
   @Test

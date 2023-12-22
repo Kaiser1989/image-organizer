@@ -2,6 +2,7 @@ package de.pkaiser.imageorganizer.archive;
 
 import static java.util.regex.Pattern.quote;
 
+import de.pkaiser.imageorganizer.meta.MetaData.Entity;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -25,8 +26,9 @@ public class Archiver {
 
 	private String path;
 
-	public void archive(final Path path, final Instant time) {
-		final PathBuilder builder = this.createPathBuilder(path, time);
+	public void archive(final Entity entity) {
+		final Path path = entity.getPath();
+		final PathBuilder builder = this.createPathBuilder(entity.getPath(), entity.getDate());
 
 		// check if folder should be adjusted
 		final boolean matchFolder = builder.matchFolder(path.getParent());

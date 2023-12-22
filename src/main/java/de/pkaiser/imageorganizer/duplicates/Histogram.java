@@ -2,7 +2,6 @@ package de.pkaiser.imageorganizer.duplicates;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +14,10 @@ public class Histogram {
   @Getter
   private final File file;
 
+  private final int width;
+
+  private final int height;
+
   private final float[][][] channels;
 
   public Histogram(final File file) throws IOException {
@@ -22,7 +25,10 @@ public class Histogram {
     this.channels = new float[4][4][4];
 
     final BufferedImage image = ImageIO.read(file);
-    final int res = image.getWidth() * image.getHeight();
+    this.width = image.getWidth();
+    this.height = image.getHeight();
+
+    final int res = this.width * this.height;
     final Raster raster = image.getData();
     final int bands = raster.getNumBands();
     if (bands > 4) {
@@ -46,10 +52,10 @@ public class Histogram {
     }
   }
 
-  public static boolean isSimilar(final Histogram h1, final Histogram h2) {
+  public static Similarity checkSimilarity(final Histogram h1, final Histogram h2) {
     // they are not similar, they are the same
     if (h1.file.getName().equals(h2.file.getName())) {
-      return false;
+      return Similarity.SAME;
     }
 
     // compare histograms
@@ -61,7 +67,20 @@ public class Histogram {
         }
       }
     }
-    return sum <= 1;
+
+    // evaluate result
+    if (sum < 0.001 && matchFileSize(h1, h2)) {
+      return Similarity.SAME;
+    } else if (sum <= 2) {
+      return Similarity.SIMILAR;
+    } else {
+      return Similarity.DIFFERENT;
+    }
+  }
+
+  private static boolean matchFileSize(final Histogram h1, final Histogram h2) {
+    return h1.width == h2.width && h1.height == h2.height && h1.getFile().length() == h2.getFile()
+        .length();
   }
 
   @Override

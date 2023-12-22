@@ -1,61 +1,43 @@
 package de.pkaiser.imageorganizer;
 
-import de.pkaiser.imageorganizer.duplicates.DuplicateFinder;
-import java.nio.file.Path;
-import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import de.pkaiser.imageorganizer.archive.Archiver;
-import de.pkaiser.imageorganizer.archive.MediaFileVisitor;
-import de.pkaiser.imageorganizer.meta.MetaDataRestorer;
+import de.pkaiser.imageorganizer.meta.MetaData;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class OrganizerService {
 
-	private final Settings settings;
+  private final Settings settings;
 
-	public OrganizerService(final Settings settings) {
-		this.settings = settings;
-	}
+  private final MetaData metaData;
 
-	public void organize() throws Exception {
+  public void temporalSplit() {
+    log.info("Start splitting into temporal folders ...");
 
-		// save files to save file tree iterations
-		Map<Path, Optional<Instant>> files = new LinkedHashMap<>();
+    // split files into years/month folders
+    final Archiver archiver = new Archiver(settings.getFolder());
+    metaData.getFiles().values().forEach(archiver::archive);
+  }
 
-		// first of all, restore all meta data
-		log.info("Start restoring metadata ...");
-		final MetaDataRestorer restorer = new MetaDataRestorer();
-		new MediaFileVisitor(settings.getFolder()).run(path -> {
-			files.put(path, restorer.restore(path));
-		});
+  public void temporalMerge() {
+    log.info("Start merging temporal folders ...");
 
-		// check if we should stop after restoring
-		if (!settings.isArchive()) {
-			return;
-		}
+    // split files into years/month folders
+    final Archiver archiver = new Archiver(settings.getFolder());
+    metaData.getFiles().values().forEach(archiver::archive);
+  }
 
-		log.info("Start moving files ...");
-		final Archiver archiver = new Archiver(settings.getFolder());
-		files.forEach((path, optTime) -> {
-			optTime.ifPresent(time -> archiver.archive(path, time));
-		});
+  public void cleanEmptyFolders() {
+    log.info("Delete empty folders ...");
 
-		log.info("delete empty folders ...");
-		archiver.cleanEmptyFolders();
+    // delete all empty folders
+    final Archiver archiver = new Archiver(settings.getFolder());
+    archiver.cleanEmptyFolders();
 
-		// check if we should stop after archiving
-		if (!settings.isCleanDuplicates()) {
-			return;
-		}
-
-		log.info("Clean duplicates ...");
-		new DuplicateFinder(settings.getFolder()).clean();
-	}
+    log.info("... empty folders deleted successfully!");
+  }
 }

@@ -1,5 +1,4 @@
 app:
-   folder: "D:\\TestArchive"
-   archive: true
+   folder: "."
    images: [jpg, jpeg, png, gif]
    videos: [avi, mp4, mov]

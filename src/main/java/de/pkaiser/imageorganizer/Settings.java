@@ -14,12 +14,6 @@ public class Settings {
 	@Value("${app.folder}")
 	private String folder;
 
-	@Value("${app.archive:true}")
-	private boolean archive;
-
-	@Value("${app.cleanDuplicates:true}")
-	private boolean cleanDuplicates;
-
 	@Value("${app.images:}")
 	private List<String> images;
 
